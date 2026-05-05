@@ -1,33 +1,32 @@
 #!/usr/bin/env bash
+
 set -e
 
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then
-    echo "Please run with sudo: sudo $0"
+SCRIPT_NAME="notes"
+INSTALL_PATH="/usr/local/bin/$SCRIPT_NAME"
+SOURCE_PATH="$(pwd)/app.py"
+
+echo "Installing $SCRIPT_NAME..."
+
+# Check if script exists
+if [ ! -f "$SOURCE_PATH" ]; then
+    echo "Error: notes.py not found in current directory"
     exit 1
 fi
 
-# Check python3
-command -v python3 >/dev/null || { echo "Error: python3 not found"; exit 1; }
+# Copy to system bin
+sudo cp "$SOURCE_PATH" "$INSTALL_PATH"
 
-# Check source file
-[ -f "./app.py" ] || { echo "Error: app.py not found"; exit 1; }
+# Make executable
+sudo chmod +x "$INSTALL_PATH"
 
-# Create directories
-mkdir -p /usr/local/bin /usr/local/share/notes-cli
+# Ensure python shebang exists
+if ! head -n 1 "$INSTALL_PATH" | grep -q "^#!"; then
+    echo "Adding python shebang..."
+    sudo sed -i '1i #!/usr/bin/env python3' "$INSTALL_PATH"
+fi
 
-# Install files
-cp ./app.py /usr/local/share/notes-cli/
-chmod +x /usr/local/share/notes-cli/app.py
+echo "Installed successfully!"
+echo "Run it with: $SCRIPT_NAME"
 
-# Create launcher
-cat > /usr/local/bin/notes <<EOF
-#!/usr/bin/env bash
-exec python3 /usr/local/share/notes-cli/app.py "\$@"
-EOF
-
-chmod +x /usr/local/bin/notes
-
-echo "Run with: notes"
-
-#YES THIS IS INSTALL SCRIPT IS MADE WITH AI.
+#YES THIS IS FULLY WRITTEN BY AI LIKE WHAT YOU GONNA BE MAD
