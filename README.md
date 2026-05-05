@@ -3,7 +3,6 @@
 
 # </How to install?>
 
-## //Linux
 First clone the repository:
 ```bash
 git clone https://github.com/TibeDev/vdb-notes.git
